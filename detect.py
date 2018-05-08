@@ -5,20 +5,20 @@ from models.tiny_yolo import TinyYoloNet
 from utils import *
 from darknet import Darknet
 
-def detect(cfgfile, weightfile, imgfile):
+def detect(cfgfile, weightfile, imgfile, namefile):
     m = Darknet(cfgfile)
 
     m.print_network()
     m.load_weights(weightfile)
     print('Loading weights from %s... Done!' % (weightfile))
 
-    num_classes = 80
+    num_classes = 3
     if num_classes == 20:
         namesfile = 'data/voc.names'
     elif num_classes == 80:
         namesfile = 'data/coco.names'
     else:
-        namesfile = 'data/names'
+        namesfile = namefile
     
     use_cuda = 1
     if use_cuda:
@@ -37,7 +37,8 @@ def detect(cfgfile, weightfile, imgfile):
     class_names = load_class_names(namesfile)
     plot_boxes(img, boxes, 'predictions.jpg', class_names)
 
-def detect_cv2(cfgfile, weightfile, imgfile):
+
+def detect_cv2(cfgfile, weightfile, imgfile, namefile):
     import cv2
     m = Darknet(cfgfile)
 
@@ -50,7 +51,7 @@ def detect_cv2(cfgfile, weightfile, imgfile):
     elif m.num_classes == 80:
         namesfile = 'data/coco.names'
     else:
-        namesfile = 'data/names'
+        namesfile = namefile
     
     use_cuda = 1
     if use_cuda:
@@ -107,14 +108,15 @@ def detect_skimage(cfgfile, weightfile, imgfile):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 4:
+    if len(sys.argv) == 5:
         cfgfile = sys.argv[1]
         weightfile = sys.argv[2]
         imgfile = sys.argv[3]
-        detect(cfgfile, weightfile, imgfile)
+        namefile = sys.argv[4]
+        detect(cfgfile, weightfile, imgfile, namefile)
         #detect_cv2(cfgfile, weightfile, imgfile)
         #detect_skimage(cfgfile, weightfile, imgfile)
     else:
         print('Usage: ')
-        print('  python detect.py cfgfile weightfile imgfile')
+        print('  python detect.py cfgfile weightfile imgfile namefile')
         #detect('cfg/tiny-yolo-voc.cfg', 'tiny-yolo-voc.weights', 'data/person.jpg', version=1)

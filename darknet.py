@@ -19,6 +19,7 @@ class Upsample(nn.Module):
     def __init__(self, stride=2):
         super(Upsample, self).__init__()
         self.stride = stride
+
     def forward(self, x):
         stride = self.stride
         assert(x.data.dim() == 4)
@@ -176,7 +177,7 @@ class Darknet(nn.Module):
                 kernel_size = int(block['size'])
                 stride = int(block['stride'])
                 is_pad = int(block['pad'])
-                pad = (kernel_size-1)/2 if is_pad else 0
+                pad = int((kernel_size-1)/2) if is_pad else 0
                 activation = block['activation']
                 model = nn.Sequential()
                 if batch_normalize:
@@ -234,7 +235,7 @@ class Darknet(nn.Module):
             elif block['type'] == 'upsample':
                 stride = int(block['stride'])
                 out_filters.append(prev_filters)
-                prev_stride = prev_stride / stride
+                prev_stride = prev_stride // stride
                 out_strides.append(prev_stride)
                 #models.append(nn.Upsample(scale_factor=stride, mode='nearest'))
                 models.append(Upsample(stride))
